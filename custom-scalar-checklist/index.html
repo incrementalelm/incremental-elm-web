@@ -1,0 +1,953 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="preload" href="content.txt" as="fetch" crossorigin="">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/service-worker.js");
+        });
+      } else {
+        console.log("No service worker registered.");
+      }
+    </script>
+  <link rel="shortcut icon" href="/assets/favicon.ico"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="manifest" href="/assets/manifest.json"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#ffffff"><meta name="application-name" content="Incremental Elm Consulting"><link rel="apple-touch-icon" sizes="57x57" href="/assets/apple-touch-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/assets/apple-touch-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/assets/apple-touch-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/assets/apple-touch-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/assets/apple-touch-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/assets/apple-touch-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/assets/apple-touch-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/assets/apple-touch-icon-152x152.png"><link rel="apple-touch-icon" sizes="167x167" href="/assets/apple-touch-icon-167x167.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon-180x180.png"><link rel="apple-touch-icon" sizes="1024x1024" href="/assets/apple-touch-icon-1024x1024.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Incremental Elm Consulting"><script type="text/javascript" src="/main.js"></script><style>/* BASICS */
+
+.CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  font-family: "Roboto Mono", monospace;
+  height: auto;
+  color: black;
+  direction: ltr;
+}
+
+/* PADDING */
+
+.CodeMirror-lines {
+  padding: 4px 0; /* Vertical padding around content */
+}
+.CodeMirror pre {
+  padding: 0 4px; /* Horizontal padding of content */
+}
+
+.CodeMirror-scrollbar-filler,
+.CodeMirror-gutter-filler {
+  background-color: white; /* The little square between H and V scrollbars */
+}
+
+/* GUTTER */
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd;
+  background-color: #f7f7f7;
+  white-space: nowrap;
+}
+.CodeMirror-linenumbers {
+}
+.CodeMirror-linenumber {
+  padding: 0 3px 0 5px;
+  min-width: 20px;
+  text-align: right;
+  color: #999;
+  white-space: nowrap;
+}
+
+.CodeMirror-guttermarker {
+  color: black;
+}
+.CodeMirror-guttermarker-subtle {
+  color: #999;
+}
+
+/* CURSOR */
+
+.CodeMirror-cursor {
+  border-left: 1px solid black;
+  border-right: none;
+  width: 0;
+}
+/* Shown when moving in bi-directional text */
+.CodeMirror div.CodeMirror-secondarycursor {
+  border-left: 1px solid silver;
+}
+.cm-fat-cursor .CodeMirror-cursor {
+  width: auto;
+  border: 0 !important;
+  background: #7e7;
+}
+.cm-fat-cursor div.CodeMirror-cursors {
+  z-index: 1;
+}
+.cm-fat-cursor-mark {
+  background-color: rgba(20, 255, 20, 0.5);
+  -webkit-animation: blink 1.06s steps(1) infinite;
+  -moz-animation: blink 1.06s steps(1) infinite;
+  animation: blink 1.06s steps(1) infinite;
+}
+.cm-animate-fat-cursor {
+  width: auto;
+  border: 0;
+  -webkit-animation: blink 1.06s steps(1) infinite;
+  -moz-animation: blink 1.06s steps(1) infinite;
+  animation: blink 1.06s steps(1) infinite;
+  background-color: #7e7;
+}
+@-moz-keyframes blink {
+  0% {
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+  }
+}
+@-webkit-keyframes blink {
+  0% {
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+  }
+}
+@keyframes blink {
+  0% {
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+  }
+}
+
+/* Can style cursor different in overwrite (non-insert) mode */
+.CodeMirror-overwrite .CodeMirror-cursor {
+}
+
+.cm-tab {
+  display: inline-block;
+  text-decoration: inherit;
+}
+
+.CodeMirror-rulers {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -50px;
+  bottom: -20px;
+  overflow: hidden;
+}
+.CodeMirror-ruler {
+  border-left: 1px solid #ccc;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+}
+
+/* DEFAULT THEME */
+
+.cm-s-default .cm-header {
+  color: blue;
+}
+.cm-s-default .cm-quote {
+  color: #090;
+}
+.cm-negative {
+  color: #d44;
+}
+.cm-positive {
+  color: #292;
+}
+.cm-header,
+.cm-strong {
+  font-weight: bold;
+}
+.cm-em {
+  font-style: italic;
+}
+.cm-link {
+  text-decoration: underline;
+}
+.cm-strikethrough {
+  text-decoration: line-through;
+}
+
+.cm-s-default .cm-keyword {
+  color: #708;
+}
+.cm-s-default .cm-atom {
+  color: #219;
+}
+.cm-s-default .cm-number {
+  color: #164;
+}
+.cm-s-default .cm-def {
+  color: #00f;
+}
+.cm-s-default .cm-variable,
+.cm-s-default .cm-punctuation,
+.cm-s-default .cm-property,
+.cm-s-default .cm-operator {
+}
+.cm-s-default .cm-variable-2 {
+  color: #05a;
+}
+.cm-s-default .cm-variable-3,
+.cm-s-default .cm-type {
+  color: #085;
+}
+.cm-s-default .cm-comment {
+  color: #a50;
+}
+.cm-s-default .cm-string {
+  color: #a11;
+}
+.cm-s-default .cm-string-2 {
+  color: #f50;
+}
+.cm-s-default .cm-meta {
+  color: #555;
+}
+.cm-s-default .cm-qualifier {
+  color: #555;
+}
+.cm-s-default .cm-builtin {
+  color: #30a;
+}
+.cm-s-default .cm-bracket {
+  color: #997;
+}
+.cm-s-default .cm-tag {
+  color: #170;
+}
+.cm-s-default .cm-attribute {
+  color: #00c;
+}
+.cm-s-default .cm-hr {
+  color: #999;
+}
+.cm-s-default .cm-link {
+  color: #00c;
+}
+
+.cm-s-default .cm-error {
+  color: #f00;
+}
+.cm-invalidchar {
+  color: #f00;
+}
+
+.CodeMirror-composing {
+  border-bottom: 2px solid;
+}
+
+/* Default styles for common addons */
+
+div.CodeMirror span.CodeMirror-matchingbracket {
+  color: #0b0;
+}
+div.CodeMirror span.CodeMirror-nonmatchingbracket {
+  color: #a22;
+}
+.CodeMirror-matchingtag {
+  background: rgba(255, 150, 0, 0.3);
+}
+.CodeMirror-activeline-background {
+  background: #e8f2ff;
+}
+
+/* STOP */
+
+/* The rest of this file contains styles related to the mechanics of
+   the editor. You probably shouldn't touch them. */
+
+.CodeMirror {
+  position: relative;
+  overflow: hidden;
+  /* background: white; */
+  background: rgba(0, 0, 0, 0.033);
+  padding: 10px;
+}
+
+.CodeMirror-scroll {
+  overflow: scroll !important; /* Things will break if this is overridden */
+  /* 30px is the magic margin used to hide the element's real scrollbars */
+  /* See overflow: hidden in .CodeMirror */
+  margin-bottom: -30px;
+  margin-right: -30px;
+  padding-bottom: 30px;
+  height: 100%;
+  outline: none; /* Prevent dragging from highlighting the element */
+  position: relative;
+}
+.CodeMirror-sizer {
+  position: relative;
+  border-right: 30px solid transparent;
+}
+
+/* The fake, visible scrollbars. Used to force redraw during scrolling
+   before actual scrolling happens, thus preventing shaking and
+   flickering artifacts. */
+.CodeMirror-vscrollbar,
+.CodeMirror-hscrollbar,
+.CodeMirror-scrollbar-filler,
+.CodeMirror-gutter-filler {
+  position: absolute;
+  z-index: 6;
+  display: none;
+}
+.CodeMirror-vscrollbar {
+  right: 0;
+  top: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.CodeMirror-hscrollbar {
+  bottom: 0;
+  left: 0;
+  overflow-y: hidden;
+  overflow-x: scroll;
+}
+.CodeMirror-scrollbar-filler {
+  right: 0;
+  bottom: 0;
+}
+.CodeMirror-gutter-filler {
+  left: 0;
+  bottom: 0;
+}
+
+.CodeMirror-gutters {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-height: 100%;
+  z-index: 3;
+}
+.CodeMirror-gutter {
+  white-space: normal;
+  height: 100%;
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: -30px;
+}
+.CodeMirror-gutter-wrapper {
+  position: absolute;
+  z-index: 4;
+  background: none !important;
+  border: none !important;
+}
+.CodeMirror-gutter-background {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+}
+.CodeMirror-gutter-elt {
+  position: absolute;
+  cursor: default;
+  z-index: 4;
+}
+.CodeMirror-gutter-wrapper ::selection {
+  background-color: transparent;
+}
+.CodeMirror-gutter-wrapper ::-moz-selection {
+  background-color: transparent;
+}
+
+.CodeMirror-lines {
+  cursor: text;
+  min-height: 1px; /* prevents collapsing before first draw */
+}
+.CodeMirror pre {
+  /* Reset some styles that the rest of the page might have set */
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  border-width: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: inherit;
+  color: inherit;
+  z-index: 2;
+  position: relative;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-variant-ligatures: contextual;
+  font-variant-ligatures: contextual;
+}
+.CodeMirror-wrap pre {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: normal;
+}
+
+.CodeMirror-linebackground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+.CodeMirror-linewidget {
+  position: relative;
+  z-index: 2;
+  padding: 0.1px; /* Force widget margins to stay inside of the container */
+}
+
+.CodeMirror-widget {
+}
+
+.CodeMirror-rtl pre {
+  direction: rtl;
+}
+
+.CodeMirror-code {
+  outline: none;
+}
+
+/* Force content-box sizing for the elements where we expect it */
+.CodeMirror-scroll,
+.CodeMirror-sizer,
+.CodeMirror-gutter,
+.CodeMirror-gutters,
+.CodeMirror-linenumber {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.CodeMirror-measure {
+  position: absolute;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.CodeMirror-cursor {
+  position: absolute;
+  pointer-events: none;
+}
+.CodeMirror-measure pre {
+  position: static;
+}
+
+div.CodeMirror-cursors {
+  visibility: hidden;
+  position: relative;
+  z-index: 3;
+}
+div.CodeMirror-dragcursors {
+  visibility: visible;
+}
+
+.CodeMirror-focused div.CodeMirror-cursors {
+  visibility: visible;
+}
+
+.CodeMirror-selected {
+  background: #d9d9d9;
+}
+.CodeMirror-focused .CodeMirror-selected {
+  background: #d7d4f0;
+}
+.CodeMirror-crosshair {
+  cursor: crosshair;
+}
+.CodeMirror-line::selection,
+.CodeMirror-line > span::selection,
+.CodeMirror-line > span > span::selection {
+  background: #d7d4f0;
+}
+.CodeMirror-line::-moz-selection,
+.CodeMirror-line > span::-moz-selection,
+.CodeMirror-line > span > span::-moz-selection {
+  background: #d7d4f0;
+}
+
+.cm-searching {
+  background-color: #ffa;
+  background-color: rgba(255, 255, 0, 0.4);
+}
+
+/* Used to force a border model for a node */
+.cm-force-border {
+  padding-right: 0.1px;
+}
+
+@media print {
+  /* Hide the cursor when printing */
+  .CodeMirror div.CodeMirror-cursors {
+    visibility: hidden;
+  }
+}
+
+/* See issue #2901 */
+.cm-tab-wrap-hack:after {
+  content: "";
+}
+
+/* Help users use markselection to safely style text background */
+span.CodeMirror-selectedtext {
+  background: none;
+}
+</style><style>iframe {
+  border: 0;
+}
+.embed-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+}
+.embed-container iframe,
+.embed-container object,
+.embed-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Remove Mobile Safari submit button rounding */
+form input[type="submit"] {
+  border-radius: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+form {
+  font-family: "Open Sans", arial, sans;
+}
+form h2 {
+  background: #4d4d4d;
+  font-family: "Open Sans", sans-serif;
+  color: #797979;
+  font-size: 18px;
+  font-weight: 100;
+  padding: 20px;
+  margin: -30px -30px 30px -30px;
+}
+form input[type="text"],
+form input[type="date"],
+form input[type="datetime"],
+form input[type="email"],
+form input[type="number"],
+form input[type="search"],
+form input[type="time"],
+form input[type="url"],
+form input[type="password"],
+form textarea,
+form select {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  outline: none;
+  display: block;
+  width: 100%;
+  padding: 7px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  border-radius: 3px;
+  margin-top: 10px;
+  background: transparent;
+  margin-bottom: 10px;
+  font: 16px Arial, Helvetica, sans-serif;
+  height: 45px;
+  -webkit-appearance: none;
+  background-color: #eee;
+}
+form textarea {
+  resize: none;
+  overflow: hidden;
+}
+form input[type="button"],
+form input[type="submit"] {
+  -moz-box-shadow: inset 0px 1px 0px 0px #45d6d6;
+  -webkit-box-shadow: inset 0px 1px 0px 0px #45d6d6;
+  box-shadow: inset 0px 1px 0px 0px #45d6d6;
+  background-color: #2cbbbb;
+  border: 1px solid #27a0a0;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  padding: 8px 18px;
+  text-decoration: none;
+}
+form input[type="submit"] {
+  background-color: rgba(0, 168, 232, 1);
+  font-family: "Raleway";
+  font-size: 20px;
+  border: none;
+  color: #fff;
+  padding: 10px 50px;
+  border-radius: 10px;
+  font-weight: normal;
+}
+form input[type="submit"]:hover {
+  background-color: rgba(20, 188, 252, 1);
+}
+</style><meta name="generator" content="elm-pages v1.0.37"><link rel="canonical" href="https://incrementalelm.com/custom-scalar-checklist"><meta name="description" content="Custom Scalar Checklist"><meta property="og:image" content="https://incrementalelm.com/images/icon.svg"><meta property="og:image:secure_url" content="https://incrementalelm.com/images/icon.svg"><meta property="og:image:alt" content="Custom Scalar Checklist"><meta property="og:title" content="Custom Scalar Checklist"><meta property="og:url" content="https://incrementalelm.com/custom-scalar-checklist"><meta property="og:description" content="Custom Scalar Checklist"><meta property="og:site_name" content="Incremental Elm Consulting"><meta property="twitter:card" content="summary_large_image"><meta property="twitter:title" content="Custom Scalar Checklist"><meta property="twitter:description" content="Custom Scalar Checklist"><meta property="twitter:image" content="https://incrementalelm.com/images/icon.svg"><meta property="twitter:image:alt" content="Custom Scalar Checklist"><meta property="og:type" content="website"><title>Custom Scalar Checklist</title></head>
+
+  <body><div data-url="http://localhost:11115/custom-scalar-checklist"><div class="bg-255-255-255-0 fc-0-0-0-255 font-size-20 font-open-sanshelveticaverdanasans-serif s e wf ui s e"><div><style>@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {.s.r > .s { flex-basis: auto !important; } .s.r > .s.ctr { flex-basis: auto !important; }}
+input[type="search"],
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance:none;
+}
+
+input[type=range] {
+  -webkit-appearance: none; 
+  background: transparent;
+  position:absolute;
+  left:0;
+  top:0;
+  z-index:10;
+  width: 100%;
+  outline: dashed 1px;
+  height: 100%;
+  opacity: 0;
+}
+
+input[type=range]::-moz-range-track {
+    background: transparent;
+    cursor: pointer;
+}
+input[type=range]::-ms-track {
+    background: transparent;
+    cursor: pointer;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    background: transparent;
+    cursor: pointer;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    opacity: 0.5;
+    width: 80px;
+    height: 80px;
+    background-color: black;
+    border:none;
+    border-radius: 5px;
+}
+input[type=range]::-moz-range-thumb {
+    opacity: 0.5;
+    width: 80px;
+    height: 80px;
+    background-color: black;
+    border:none;
+    border-radius: 5px;
+}
+input[type=range]::-ms-thumb {
+    opacity: 0.5;
+    width: 80px;
+    height: 80px;
+    background-color: black;
+    border:none;
+    border-radius: 5px;
+}
+input[type=range][orient=vertical]{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical;  /* WebKit */
+}
+
+.explain {
+    border: 6px solid rgb(174, 121, 15) !important;
+}
+.explain > .s {
+    border: 4px dashed rgb(0, 151, 167) !important;
+}
+
+.ctr {
+    border: none !important;
+}
+.explain > .ctr > .s {
+    border: 4px dashed rgb(0, 151, 167) !important;
+}
+
+html,body{height:100%;padding:0;margin:0;}.s.e.ic{display:block;}.s:focus{outline:none;}.ui{width:100%;height:auto;min-height:100%;z-index:0;}.ui.s.hf{height:100%;}.ui.s.hf > .hf{height:100%;}.ui > .fr.nb{position:fixed;}.nb{position:relative;border:none;display:flex;flex-direction:row;flex-basis:auto;}.nb.e{display:flex;flex-direction:column;white-space:pre;}.nb.e.hbh{z-index:0;}.nb.e.hbh > .bh{z-index:-1;}.nb.e.sbt > .t.hf{flex-grow:0;}.nb.e.sbt > .t.wf{align-self:auto !important;}.nb.e > .hc{height:auto;}.nb.e > .hf{flex-grow:100000;}.nb.e > .wf{width:100%;}.nb.e > .wfp{width:100%;}.nb.e > .wc{align-self:flex-start;}.nb.e.ct{justify-content:flex-start;}.nb.e > .s.at{margin-bottom:auto !important;margin-top:0 !important;}.nb.e.cb{justify-content:flex-end;}.nb.e > .s.ab{margin-top:auto !important;margin-bottom:0 !important;}.nb.e.cr{align-items:flex-end;}.nb.e > .s.ar{align-self:flex-end;}.nb.e.cl{align-items:flex-start;}.nb.e > .s.al{align-self:flex-start;}.nb.e.ccx{align-items:center;}.nb.e > .s.cx{align-self:center;}.nb.e.ccy > .s{margin-top:auto;margin-bottom:auto;}.nb.e > .s.cy{margin-top:auto !important;margin-bottom:auto !important;}.nb.a{position:absolute;bottom:100%;left:0;width:100%;z-index:20;margin:0 !important;pointer-events:none;}.nb.a > .hf{height:auto;}.nb.a > .wf{width:100%;}.nb.a > *{pointer-events:auto;}.nb.b{position:absolute;bottom:0;left:0;height:0;width:100%;z-index:20;margin:0 !important;pointer-events:none;}.nb.b > *{pointer-events:auto;}.nb.b > .hf{height:auto;}.nb.or{position:absolute;left:100%;top:0;height:100%;margin:0 !important;z-index:20;pointer-events:none;}.nb.or > *{pointer-events:auto;}.nb.ol{position:absolute;right:100%;top:0;height:100%;margin:0 !important;z-index:20;pointer-events:none;}.nb.ol > *{pointer-events:auto;}.nb.fr{position:absolute;width:100%;height:100%;left:0;top:0;margin:0 !important;pointer-events:none;}.nb.fr > *{pointer-events:auto;}.nb.bh{position:absolute;width:100%;height:100%;left:0;top:0;margin:0 !important;z-index:0;pointer-events:none;}.nb.bh > *{pointer-events:auto;}.s{position:relative;border:none;flex-shrink:0;display:flex;flex-direction:row;flex-basis:auto;resize:none;font-feature-settings:inherit;box-sizing:border-box;margin:0;padding:0;border-width:0;border-style:solid;font-size:inherit;color:inherit;font-family:inherit;line-height:1;font-weight:inherit;text-decoration:none;font-style:inherit;}.s.wrp{flex-wrap:wrap;}.s.notxt{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;}.s.cptr{cursor:pointer;}.s.ctxt{cursor:text;}.s.ppe{pointer-events:none !important;}.s.cpe{pointer-events:auto !important;}.s.clr{opacity:0;}.s.oq{opacity:1;}.s.hvclr:hover{opacity:0;}.s.hvoq:hover{opacity:1;}.s.fcsclr:focus{opacity:0;}.s.fcsoq:focus{opacity:1;}.s.atvclr:active{opacity:0;}.s.atvoq:active{opacity:1;}.s.ts{transition:transform 160ms, opacity 160ms, filter 160ms, background-color 160ms, color 160ms, font-size 160ms;}.s.sb{overflow:auto;flex-shrink:1;}.s.sbx{overflow-x:auto;}.s.sbx.r{flex-shrink:1;}.s.sby{overflow-y:auto;}.s.sby.c{flex-shrink:1;}.s.sby.e{flex-shrink:1;}.s.cp{overflow:hidden;}.s.cpx{overflow-x:hidden;}.s.cpy{overflow-y:hidden;}.s.wc{width:auto;}.s.bn{border-width:0;}.s.bd{border-style:dashed;}.s.bdt{border-style:dotted;}.s.bs{border-style:solid;}.s.t{white-space:pre;display:inline-block;}.s.it{line-height:1.05;background:transparent;}.s.e{display:flex;flex-direction:column;white-space:pre;}.s.e.hbh{z-index:0;}.s.e.hbh > .bh{z-index:-1;}.s.e.sbt > .t.hf{flex-grow:0;}.s.e.sbt > .t.wf{align-self:auto !important;}.s.e > .hc{height:auto;}.s.e > .hf{flex-grow:100000;}.s.e > .wf{width:100%;}.s.e > .wfp{width:100%;}.s.e > .wc{align-self:flex-start;}.s.e.ct{justify-content:flex-start;}.s.e > .s.at{margin-bottom:auto !important;margin-top:0 !important;}.s.e.cb{justify-content:flex-end;}.s.e > .s.ab{margin-top:auto !important;margin-bottom:0 !important;}.s.e.cr{align-items:flex-end;}.s.e > .s.ar{align-self:flex-end;}.s.e.cl{align-items:flex-start;}.s.e > .s.al{align-self:flex-start;}.s.e.ccx{align-items:center;}.s.e > .s.cx{align-self:center;}.s.e.ccy > .s{margin-top:auto;margin-bottom:auto;}.s.e > .s.cy{margin-top:auto !important;margin-bottom:auto !important;}.s.r{display:flex;flex-direction:row;}.s.r > .s{flex-basis:0%;}.s.r > .s.we{flex-basis:auto;}.s.r > .s.lnk{flex-basis:auto;}.s.r > .hf{align-self:stretch !important;}.s.r > .hfp{align-self:stretch !important;}.s.r > .wf{flex-grow:100000;}.s.r > .ctr{flex-grow:0;flex-basis:auto;align-self:stretch;}.s.r > u:first-of-type.acr{flex-grow:1;}.s.r > s:first-of-type.accx{flex-grow:1;}.s.r > s:first-of-type.accx > .cx{margin-left:auto !important;}.s.r > s:last-of-type.accx{flex-grow:1;}.s.r > s:last-of-type.accx > .cx{margin-right:auto !important;}.s.r > s:only-of-type.accx{flex-grow:1;}.s.r > s:only-of-type.accx > .cy{margin-top:auto !important;margin-bottom:auto !important;}.s.r > s:last-of-type.accx ~ u{flex-grow:0;}.s.r > u:first-of-type.acr ~ s.accx{flex-grow:0;}.s.r.ct{align-items:flex-start;}.s.r > .s.at{align-self:flex-start;}.s.r.cb{align-items:flex-end;}.s.r > .s.ab{align-self:flex-end;}.s.r.cr{justify-content:flex-end;}.s.r.cl{justify-content:flex-start;}.s.r.ccx{justify-content:center;}.s.r.ccy{align-items:center;}.s.r > .s.cy{align-self:center;}.s.r.sev{justify-content:space-between;}.s.c{display:flex;flex-direction:column;}.s.c > .s{flex-basis:0%;}.s.c > .s.he{flex-basis:auto;}.s.c > .s.c{flex-basis:auto;}.s.c > .hf{flex-grow:100000;}.s.c > .wf{width:100%;}.s.c > .wfp{width:100%;}.s.c > .wc{align-self:flex-start;}.s.c > u:first-of-type.acb{flex-grow:1;}.s.c > s:first-of-type.accy{flex-grow:1;}.s.c > s:first-of-type.accy > .cy{margin-top:auto !important;margin-bottom:0 !important;}.s.c > s:last-of-type.accy{flex-grow:1;}.s.c > s:last-of-type.accy > .cy{margin-bottom:auto !important;margin-top:0 !important;}.s.c > s:only-of-type.accy{flex-grow:1;}.s.c > s:only-of-type.accy > .cy{margin-top:auto !important;margin-bottom:auto !important;}.s.c > s:last-of-type.accy ~ u{flex-grow:0;}.s.c > u:first-of-type.acb ~ s.accy{flex-grow:0;}.s.c.ct{justify-content:flex-start;}.s.c > .s.at{margin-bottom:auto;}.s.c.cb{justify-content:flex-end;}.s.c > .s.ab{margin-top:auto;}.s.c.cr{align-items:flex-end;}.s.c > .s.ar{align-self:flex-end;}.s.c.cl{align-items:flex-start;}.s.c > .s.al{align-self:flex-start;}.s.c.ccx{align-items:center;}.s.c > .s.cx{align-self:center;}.s.c.ccy{justify-content:center;}.s.c > .ctr{flex-grow:0;flex-basis:auto;width:100%;align-self:stretch !important;}.s.c.sev{justify-content:space-between;}.s.g{display:-ms-grid;}.s.g > .gp > .s{width:100%;}@supports (display:grid) {.s.g{display:grid;
+}}.s.g > .s.at{justify-content:flex-start;}.s.g > .s.ab{justify-content:flex-end;}.s.g > .s.ar{align-items:flex-end;}.s.g > .s.al{align-items:flex-start;}.s.g > .s.cx{align-items:center;}.s.g > .s.cy{justify-content:center;}.s.pg{display:block;}.s.pg > .s:first-child{margin:0 !important;}.s.pg > .s.al:first-child + .s{margin:0 !important;}.s.pg > .s.ar:first-child + .s{margin:0 !important;}.s.pg > .s.ar{float:right;}.s.pg > .s.ar::after{content:"";display:table;clear:both;}.s.pg > .s.al{float:left;}.s.pg > .s.al::after{content:"";display:table;clear:both;}.s.iml{white-space:pre-wrap;height:100%;width:100%;background-color:transparent;}.s.implw.e{flex-basis:auto;}.s.imlp{white-space:pre-wrap;cursor:text;}.s.imlp > .imlf{white-space:pre-wrap;color:transparent;}.s.p{display:block;white-space:normal;}.s.p.hbh{z-index:0;}.s.p.hbh > .bh{z-index:-1;}.s.p > .t{display:inline;white-space:normal;}.s.p > .e{display:inline;white-space:normal;}.s.p > .e.fr{display:flex;}.s.p > .e.bh{display:flex;}.s.p > .e.a{display:flex;}.s.p > .e.b{display:flex;}.s.p > .e.or{display:flex;}.s.p > .e.ol{display:flex;}.s.p > .e > .t{display:inline;white-space:normal;}.s.p > .e > .e > .t{display:inline;white-space:normal;}.s.p > .r{display:inline-flex;}.s.p > .c{display:inline-flex;}.s.p > .g{display:inline-grid;}.s.p > .s.ar{float:right;}.s.p > .s.al{float:left;}.s.hidden{display:none;}.s.w1{font-weight:100;}.s.w2{font-weight:200;}.s.w3{font-weight:300;}.s.w4{font-weight:400;}.s.w5{font-weight:500;}.s.w6{font-weight:600;}.s.w7{font-weight:700;}.s.w8{font-weight:800;}.s.w9{font-weight:900;}.s.i{font-style:italic;}.s.sk{text-decoration:line-through;}.s.u{text-decoration:underline;text-decoration-skip-ink:auto;text-decoration-skip:ink;}.s.u.sk{text-decoration:line-through underline;text-decoration-skip-ink:auto;text-decoration-skip:ink;}.s.tun{font-style:normal;}.s.tj{text-align:justify;}.s.tja{text-align:justify-all;}.s.tc{text-align:center;}.s.tr{text-align:right;}.s.tl{text-align:left;}.s.modal{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;}.border-0{border-width:0px;}.border-1{border-width:1px;}.border-2{border-width:2px;}.border-3{border-width:3px;}.border-4{border-width:4px;}.border-5{border-width:5px;}.border-6{border-width:6px;}.font-size-8{font-size:8px;}.font-size-9{font-size:9px;}.font-size-10{font-size:10px;}.font-size-11{font-size:11px;}.font-size-12{font-size:12px;}.font-size-13{font-size:13px;}.font-size-14{font-size:14px;}.font-size-15{font-size:15px;}.font-size-16{font-size:16px;}.font-size-17{font-size:17px;}.font-size-18{font-size:18px;}.font-size-19{font-size:19px;}.font-size-20{font-size:20px;}.font-size-21{font-size:21px;}.font-size-22{font-size:22px;}.font-size-23{font-size:23px;}.font-size-24{font-size:24px;}.font-size-25{font-size:25px;}.font-size-26{font-size:26px;}.font-size-27{font-size:27px;}.font-size-28{font-size:28px;}.font-size-29{font-size:29px;}.font-size-30{font-size:30px;}.font-size-31{font-size:31px;}.font-size-32{font-size:32px;}.p-0{padding:0px;}.p-1{padding:1px;}.p-2{padding:2px;}.p-3{padding:3px;}.p-4{padding:4px;}.p-5{padding:5px;}.p-6{padding:6px;}.p-7{padding:7px;}.p-8{padding:8px;}.p-9{padding:9px;}.p-10{padding:10px;}.p-11{padding:11px;}.p-12{padding:12px;}.p-13{padding:13px;}.p-14{padding:14px;}.p-15{padding:15px;}.p-16{padding:16px;}.p-17{padding:17px;}.p-18{padding:18px;}.p-19{padding:19px;}.p-20{padding:20px;}.p-21{padding:21px;}.p-22{padding:22px;}.p-23{padding:23px;}.p-24{padding:24px;}.v-smcp{font-variant:small-caps;}.v-smcp-off{font-variant:normal;}.v-zero{font-feature-settings:"zero";}.v-zero-off{font-feature-settings:"zero" 0;}.v-onum{font-feature-settings:"onum";}.v-onum-off{font-feature-settings:"onum" 0;}.v-liga{font-feature-settings:"liga";}.v-liga-off{font-feature-settings:"liga" 0;}.v-dlig{font-feature-settings:"dlig";}.v-dlig-off{font-feature-settings:"dlig" 0;}.v-ordn{font-feature-settings:"ordn";}.v-ordn-off{font-feature-settings:"ordn" 0;}.v-tnum{font-feature-settings:"tnum";}.v-tnum-off{font-feature-settings:"tnum" 0;}.v-afrc{font-feature-settings:"afrc";}.v-afrc-off{font-feature-settings:"afrc" 0;}.v-frac{font-feature-settings:"frac";}.v-frac-off{font-feature-settings:"frac" 0;}</style></div><div><style>
+
+
+.font-open-sanshelveticaverdanasans-serif.cap, .font-open-sanshelveticaverdanasans-serif .cap {line-height: 1;} .font-open-sanshelveticaverdanasans-serif.cap> .t, .font-open-sanshelveticaverdanasans-serif .cap > .t {vertical-align: 0;line-height: 1;}.ff-open-sans .font-open-sanshelveticaverdanasans-serif.cap, .ff-open-sans .font-open-sanshelveticaverdanasans-serif .cap {line-height: 1;} .ff-open-sans .font-open-sanshelveticaverdanasans-serif.cap> .t, .ff-open-sans .font-open-sanshelveticaverdanasans-serif .cap > .t {vertical-align: 0;line-height: 1;}.ff-raleway .font-open-sanshelveticaverdanasans-serif.cap, .ff-raleway .font-open-sanshelveticaverdanasans-serif .cap {line-height: 1;} .ff-raleway .font-open-sanshelveticaverdanasans-serif.cap> .t, .ff-raleway .font-open-sanshelveticaverdanasans-serif .cap > .t {vertical-align: 0;line-height: 1;}.ff-roboto-mono .font-open-sanshelveticaverdanasans-serif.cap, .ff-roboto-mono .font-open-sanshelveticaverdanasans-serif .cap {line-height: 1;} .ff-roboto-mono .font-open-sanshelveticaverdanasans-serif.cap> .t, .ff-roboto-mono .font-open-sanshelveticaverdanasans-serif .cap > .t {vertical-align: 0;line-height: 1;}
+.font-open-sanshelveticaverdanasans-serif .ff-open-sans.cap, .font-open-sanshelveticaverdanasans-serif .ff-open-sans .cap {line-height: 1;} .font-open-sanshelveticaverdanasans-serif .ff-open-sans.cap> .t, .font-open-sanshelveticaverdanasans-serif .ff-open-sans .cap > .t {vertical-align: 0;line-height: 1;}.ff-open-sans.cap, .ff-open-sans .cap {line-height: 1;} .ff-open-sans.cap> .t, .ff-open-sans .cap > .t {vertical-align: 0;line-height: 1;}.ff-raleway .ff-open-sans.cap, .ff-raleway .ff-open-sans .cap {line-height: 1;} .ff-raleway .ff-open-sans.cap> .t, .ff-raleway .ff-open-sans .cap > .t {vertical-align: 0;line-height: 1;}.ff-roboto-mono .ff-open-sans.cap, .ff-roboto-mono .ff-open-sans .cap {line-height: 1;} .ff-roboto-mono .ff-open-sans.cap> .t, .ff-roboto-mono .ff-open-sans .cap > .t {vertical-align: 0;line-height: 1;}
+.font-open-sanshelveticaverdanasans-serif .ff-raleway.cap, .font-open-sanshelveticaverdanasans-serif .ff-raleway .cap {line-height: 1;} .font-open-sanshelveticaverdanasans-serif .ff-raleway.cap> .t, .font-open-sanshelveticaverdanasans-serif .ff-raleway .cap > .t {vertical-align: 0;line-height: 1;}.ff-open-sans .ff-raleway.cap, .ff-open-sans .ff-raleway .cap {line-height: 1;} .ff-open-sans .ff-raleway.cap> .t, .ff-open-sans .ff-raleway .cap > .t {vertical-align: 0;line-height: 1;}.ff-raleway.cap, .ff-raleway .cap {line-height: 1;} .ff-raleway.cap> .t, .ff-raleway .cap > .t {vertical-align: 0;line-height: 1;}.ff-roboto-mono .ff-raleway.cap, .ff-roboto-mono .ff-raleway .cap {line-height: 1;} .ff-roboto-mono .ff-raleway.cap> .t, .ff-roboto-mono .ff-raleway .cap > .t {vertical-align: 0;line-height: 1;}
+.font-open-sanshelveticaverdanasans-serif .ff-roboto-mono.cap, .font-open-sanshelveticaverdanasans-serif .ff-roboto-mono .cap {line-height: 1;} .font-open-sanshelveticaverdanasans-serif .ff-roboto-mono.cap> .t, .font-open-sanshelveticaverdanasans-serif .ff-roboto-mono .cap > .t {vertical-align: 0;line-height: 1;}.ff-open-sans .ff-roboto-mono.cap, .ff-open-sans .ff-roboto-mono .cap {line-height: 1;} .ff-open-sans .ff-roboto-mono.cap> .t, .ff-open-sans .ff-roboto-mono .cap > .t {vertical-align: 0;line-height: 1;}.ff-raleway .ff-roboto-mono.cap, .ff-raleway .ff-roboto-mono .cap {line-height: 1;} .ff-raleway .ff-roboto-mono.cap> .t, .ff-raleway .ff-roboto-mono .cap > .t {vertical-align: 0;line-height: 1;}.ff-roboto-mono.cap, .ff-roboto-mono .cap {line-height: 1;} .ff-roboto-mono.cap> .t, .ff-roboto-mono .cap > .t {vertical-align: 0;line-height: 1;}.fc-0-0-0-128{
+  color: rgba(0,0,0,0.5);
+}.max-width-500{
+  max-width: 500px;
+}.box-0px0px1020px255px217-217-217-255-hv:hover {
+  box-shadow: 0px 0px 4px 1px rgba(217,217,217,1);
+}.box-0px0px1020px255px204-204-204-255{
+  box-shadow: 0px 0px 4px 1px rgba(204,204,204,1);
+}.fc-234-21-122-255-hv:hover {
+  color: rgba(234,21,122,1);
+}.fc-17-132-206-255{
+  color: rgba(17,132,206,1);
+}.ff-roboto-mono{
+  font-family: "Roboto Mono";
+  font-feature-settings: ;
+  font-variant: normal;
+}.fc-210-40-130-255{
+  color: rgba(210,40,130,1);
+}.p-5-3{
+  padding: 3px 5px 3px 5px;
+}.br-2{
+  border-radius: 2px;
+}.bg-0-0-0-10{
+  background-color: rgba(0,0,0,0.04);
+}.pad-0-0-0-20{
+  padding: 0px 0px 0px 20px;
+}.spacing-10-10.r > .s + .s{
+  margin-left: 10px;
+}.spacing-10-10.wrp.r > .s{
+  margin: 5px 5px;
+}.spacing-10-10.c > .s + .s{
+  margin-top: 10px;
+}.spacing-10-10.pg > .s + .s{
+  margin-top: 10px;
+}.spacing-10-10.pg > .al{
+  margin-right: 10px;
+}.spacing-10-10.pg > .ar{
+  margin-left: 10px;
+}.spacing-10-10.p{
+  line-height: calc(1em + 10px);
+}textarea.s.spacing-10-10{
+  line-height: calc(1em + 10px);
+  height: calc(100% + 10px);
+}.spacing-10-10.p > .al{
+  margin-right: 10px;
+}.spacing-10-10.p > .ar{
+  margin-left: 10px;
+}.spacing-10-10.p::after{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-top: -5px;
+}.spacing-10-10.p::before{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-bottom: -5px;
+}.spacing-15-15.r > .s + .s{
+  margin-left: 15px;
+}.spacing-15-15.wrp.r > .s{
+  margin: 7.5px 7.5px;
+}.spacing-15-15.c > .s + .s{
+  margin-top: 15px;
+}.spacing-15-15.pg > .s + .s{
+  margin-top: 15px;
+}.spacing-15-15.pg > .al{
+  margin-right: 15px;
+}.spacing-15-15.pg > .ar{
+  margin-left: 15px;
+}.spacing-15-15.p{
+  line-height: calc(1em + 15px);
+}textarea.s.spacing-15-15{
+  line-height: calc(1em + 15px);
+  height: calc(100% + 15px);
+}.spacing-15-15.p > .al{
+  margin-right: 15px;
+}.spacing-15-15.p > .ar{
+  margin-left: 15px;
+}.spacing-15-15.p::after{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-top: -7px;
+}.spacing-15-15.p::before{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-bottom: -7px;
+}.font-size-36{
+  font-size: 36px;
+}.spacing-30-30.r > .s + .s{
+  margin-left: 30px;
+}.spacing-30-30.wrp.r > .s{
+  margin: 15px 15px;
+}.spacing-30-30.c > .s + .s{
+  margin-top: 30px;
+}.spacing-30-30.pg > .s + .s{
+  margin-top: 30px;
+}.spacing-30-30.pg > .al{
+  margin-right: 30px;
+}.spacing-30-30.pg > .ar{
+  margin-left: 30px;
+}.spacing-30-30.p{
+  line-height: calc(1em + 30px);
+}textarea.s.spacing-30-30{
+  line-height: calc(1em + 30px);
+  height: calc(100% + 30px);
+}.spacing-30-30.p > .al{
+  margin-right: 30px;
+}.spacing-30-30.p > .ar{
+  margin-left: 30px;
+}.spacing-30-30.p::after{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-top: -15px;
+}.spacing-30-30.p::before{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-bottom: -15px;
+}.max-width-600{
+  max-width: 600px;
+}.bg-0-23-31-255{
+  background-color: rgba(0,23,31,1);
+}.height-px-2px{
+  height : 2px;
+}.width-px-30{
+  width: 30px;
+}.spacing-6-6.r > .s + .s{
+  margin-left: 6px;
+}.spacing-6-6.wrp.r > .s{
+  margin: 3px 3px;
+}.spacing-6-6.c > .s + .s{
+  margin-top: 6px;
+}.spacing-6-6.pg > .s + .s{
+  margin-top: 6px;
+}.spacing-6-6.pg > .al{
+  margin-right: 6px;
+}.spacing-6-6.pg > .ar{
+  margin-left: 6px;
+}.spacing-6-6.p{
+  line-height: calc(1em + 6px);
+}textarea.s.spacing-6-6{
+  line-height: calc(1em + 6px);
+  height: calc(100% + 6px);
+}.spacing-6-6.p > .al{
+  margin-right: 6px;
+}.spacing-6-6.p > .ar{
+  margin-left: 6px;
+}.spacing-6-6.p::after{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-top: -3px;
+}.spacing-6-6.p::before{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-bottom: -3px;
+}.ff-raleway{
+  font-family: "Raleway";
+  font-feature-settings: ;
+  font-variant: normal;
+}.spacing-20-20.r > .s + .s{
+  margin-left: 20px;
+}.spacing-20-20.wrp.r > .s{
+  margin: 10px 10px;
+}.spacing-20-20.c > .s + .s{
+  margin-top: 20px;
+}.spacing-20-20.pg > .s + .s{
+  margin-top: 20px;
+}.spacing-20-20.pg > .al{
+  margin-right: 20px;
+}.spacing-20-20.pg > .ar{
+  margin-left: 20px;
+}.spacing-20-20.p{
+  line-height: calc(1em + 20px);
+}textarea.s.spacing-20-20{
+  line-height: calc(1em + 20px);
+  height: calc(100% + 20px);
+}.spacing-20-20.p > .al{
+  margin-right: 20px;
+}.spacing-20-20.p > .ar{
+  margin-left: 20px;
+}.spacing-20-20.p::after{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-top: -10px;
+}.spacing-20-20.p::before{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-bottom: -10px;
+}.fc-0-23-31-255{
+  color: rgba(0,23,31,1);
+}.spacing-5-5.r > .s + .s{
+  margin-left: 5px;
+}.spacing-5-5.wrp.r > .s{
+  margin: 2.5px 2.5px;
+}.spacing-5-5.c > .s + .s{
+  margin-top: 5px;
+}.spacing-5-5.pg > .s + .s{
+  margin-top: 5px;
+}.spacing-5-5.pg > .al{
+  margin-right: 5px;
+}.spacing-5-5.pg > .ar{
+  margin-left: 5px;
+}.spacing-5-5.p{
+  line-height: calc(1em + 5px);
+}textarea.s.spacing-5-5{
+  line-height: calc(1em + 5px);
+  height: calc(100% + 5px);
+}.spacing-5-5.p > .al{
+  margin-right: 5px;
+}.spacing-5-5.p > .ar{
+  margin-left: 5px;
+}.spacing-5-5.p::after{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-top: -2px;
+}.spacing-5-5.p::before{
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  margin-bottom: -2px;
+}.ff-open-sans{
+  font-family: "Open Sans";
+  font-feature-settings: ;
+  font-variant: normal;
+}.width-px-100{
+  width: 100px;
+}.bg-255-255-255-255{
+  background-color: rgba(255,255,255,1);
+}.box-255px255px1275px255px0-0-0-77{
+  box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.3);
+}.font-open-sanshelveticaverdanasans-serif{
+  font-family: "Open Sans", "Helvetica", "Verdana", sans-serif;
+  font-feature-settings: ;
+  font-variant: normal;
+}.fc-0-0-0-255{
+  color: rgba(0,0,0,1);
+}.bg-255-255-255-0{
+  background-color: rgba(255,255,255,0);
+}.focus-within:focus-within{
+  box-shadow: 0px 0px 0px 3px rgba(155,203,255,1);
+  outline: none;
+}.s:focus .focusable, .s.focusable:focus{
+  box-shadow: 0px 0px 0px 3px rgba(155,203,255,1);
+  outline: none;
+}</style></div><div class="hc s c wf ct cl"><div class="hc sev box-255px255px1275px255px0-0-0-77 s r wf cl ccy"><a class="hc s e wc ccx ccy lnk" href="/" rel="noopener noreferrer"><div class="hc bg-255-255-255-255 av at s r wc cl ccy"><div class="p-20 hc av at ah al we width-px-100 s e"><svg version="1.1" x="0" y="0" viewBox="0 0 323.141 322.95" width="100%"><g><polygon points="245.213,83.375 168,163.5 245.298,240.432 323.298,160.375" style="transform: translate(-950.87px, -950.87px) scale(1); fill: rgb(0, 23, 31);"></polygon><polygon points="91.783,82.916 161.649,152.782 231.514,82.916" style="transform: translate(-1000px, -1000px) scale(1); fill: rgb(216, 219, 226);"></polygon><polygon points="8.867,0 79.241,70.375 232.213,70.375 161.838,0" style="transform: translate(-1000px, -1000px) scale(1); fill: rgb(0, 23, 31);"></polygon><polygon points="179.573,0 323.298,143.724 323.298,0" style="transform: translate(-1000px, -1000px) scale(1); fill: rgb(0, 168, 232);"></polygon><polygon points="0,8.868 0,314.432 152.781,161.649" style="transform: translate(-1000px, -1000px) scale(1); fill: rgb(0, 126, 167);"></polygon><polygon points="255.522,246.655 323.298,314.432 323.298,178.879" style="transform: translate(-1000px, -1000px) scale(1); fill: rgb(216, 219, 226);"></polygon><polygon points="161.649,170.517 8.869,323.298 314.43,323.298" style="transform: translate(-1000px, -1000px) scale(1); fill: rgb(0, 168, 232);"></polygon></g></svg></div><div class="ff-open-sans hc spacing-5-5 s c wc ct cl"><div class="hc fc-0-23-31-255 font-size-24 s e wc"><div class="s t wf hf">Incremental Elm</div></div><div class="hc fc-0-23-31-255 font-size-14 ah ar s e wc"><div class="s t wf hf">Consulting</div></div></div></div></a><div class="hc spacing-20-20 p-20 ff-raleway fc-0-23-31-255 s r wc cl ccy"><s class="s e ctr ccy accx"><div class="spacing-6-6 ah cx av cy hc s c wc ct cl"><div class="we width-px-30 he height-px-2px bg-0-23-31-255 s e" style="transform: translate(0px, 0px) rotate(0rad);"></div><div class="we width-px-30 he height-px-2px bg-0-23-31-255 s e" style="transform: translate(0px, 0px) rotate(0rad); opacity: 99;"></div><div class="we width-px-30 he height-px-2px bg-0-23-31-255 s e" style="transform: translate(0px, 0px) rotate(0rad);"></div></div></s></div></div><div class="hf p-20 spacing-30-30 s e max-width-600 wf"><div class="ah cx spacing-30-30 font-size-18 s pg wf"><div class="spacing-5-5 font-size-36 w7 tc ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">How to improve your schema with Custom Scalars</div></div></div><div class="spacing-5-5 font-size-24 w6 tl ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">What</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Use Custom Scalars instead of GraphQL primitives.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Instead of:</div></div></div><div class="hc font-size-16 s e wc"><code-editor></code-editor></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Try using Custom Scalars like this:</div></div></div><div class="hc font-size-16 s e wc"><code-editor></code-editor></div><div class="spacing-5-5 font-size-24 w6 tl ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">When</div></div></div><div class="hc s c wc ct cl"><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">You want to transform the value into a particular data structure (e.g. Custom Scalar </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">DateTime</div></div><div class="hc s e wc"><div class="s t wf hf"> -&gt; Elm </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">Time</div></div><div class="hc s e wc"><div class="s t wf hf">)</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">You want to ensure that a value is not mixed up and passed in where it has the same primitive representation but different semantic meaning (for example, </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">ProductId</div></div><div class="hc s e wc"><div class="s t wf hf"> and </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">UserId</div></div><div class="hc s e wc"><div class="s t wf hf"> might both be Strings, but if they are Custom Scalars then </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">elm-graphql</div></div><div class="hc s e wc"><div class="s t wf hf"> can prevent you from passing in the wrong type.</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">You want to control </div></div><div class="hc w7 s e wc"><div class="s t wf hf">how</div></div><div class="hc s e wc"><div class="s t wf hf"> the data is used. For example a </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">Temperature</div></div><div class="hc s e wc"><div class="s t wf hf"> or </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD</div></div><div class="hc s e wc"><div class="s t wf hf"> Custom Scalar has implementation details (perhaps </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD</div></div><div class="hc s e wc"><div class="s t wf hf"> is represented in cents, but you don’t want to leak that knowledge all over your codebase, you want to keep it in one central location).</div></div></div></div></div><div class="hc s c wc ct cl"></div></div></div><div class="spacing-5-5 font-size-24 w6 tl ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">Why</div></div></div><div class="spacing-15-15 s p wf"><div class="hc w7 s e wc"><div class="s t wf hf">Custom Scalars are a way of representing a contract.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">For example, a </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">DateTime</div></div><div class="hc s e wc"><div class="s t wf hf"> is just a </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">String</div></div><div class="hc s e wc"><div class="s t wf hf"> under the hood. But there is a contract. When I call a value a </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">DateTime</div></div><div class="hc s e wc"><div class="s t wf hf">, I am promising that you will always be able to parse it as an ISO-8601 String (or however it is represented in your API).</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">The data in your GraphQL response will actually be the same. But by using the </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">DateTime</div></div><div class="hc s e wc"><div class="s t wf hf"> Custom Scalar,  you are telling  </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">elm-graphql</div></div><div class="hc s e wc"><div class="s t wf hf"> that it is safe to use it in a specific way. In this case, it may be that it can parse it as an ISO-8601 String.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Some other examples would be representing Currency (perhaps </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD</div></div><div class="hc s e wc"><div class="s t wf hf">). Again, the underlying representative is just a GraphQL primitive, but you’ve now given it semantic meaning. And </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">elm-graphql</div></div><div class="hc s e wc"><div class="s t wf hf"> is able to take this semantic meaning and turn it into a specific type.</div></div></div><div class="spacing-5-5 font-size-24 w6 tl ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">Custom Scalars for Ids</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">GraphQL provides a type called </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">Id</div></div><div class="hc s e wc"><div class="s t wf hf">. I recommend ignoring this type and instead creating a Custom Scalar to represent each type of Id in your domain. For example </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">ProductId</div></div><div class="hc s e wc"><div class="s t wf hf"> or </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">UserId</div></div><div class="hc s e wc"><div class="s t wf hf">.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Why bother?</div></div></div><div class="hc s c wc ct cl"><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Nice clear information in the documentation for free</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Elm can prevent you from passing in a </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">UserId</div></div><div class="hc s e wc"><div class="s t wf hf"> where the API requires a </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">ProductId</div></div></div></div></div><div class="hc s c wc ct cl"></div></div></div><div class="spacing-5-5 font-size-24 w6 tl ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">Custom Scalars as Gate Keepers</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Custom Scalars also provide a pinch point that allows you to limit all the knowledge about how to use a certain type to a single place. For example, you can use an Opaque Type to make sure that the only way </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD</div></div><div class="hc s e wc"><div class="s t wf hf"> is displayed is by asking the </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD.elm</div></div><div class="hc s e wc"><div class="s t wf hf"> module to display it for you. This gives you confidence that the knowledge of how to turn the underlying data representation for </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD</div></div><div class="hc s e wc"><div class="s t wf hf"> is not leaked throughout your codebase, which reduces bugs and makes it easier to reason about your code.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">If you’re not using the Custom Scalar Codecs functionality in </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">elm-graphql</div></div><div class="hc s e wc"><div class="s t wf hf">. Take a look at the official </div></div><a class="hc s e wc ccx ccy lnk" href="https://github.com/dillonkearns/elm-graphql/blob/master/examples/src/Example07CustomCodecs.elm" rel="noopener noreferrer"><div class="hc fc-17-132-206-255  fc-234-21-122-255-hv s r wc cl ccy" style="display: inline-flex;"><div class="hc s e wc"><div class="s t wf hf">Custom Scalar Codecs example and instructions</div></div></div></a><div class="hc s e wc"><div class="s t wf hf">.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Here’s an example illustrating this with </div></div><div class="hc bg-0-0-0-10 br-2 p-5-3 font-size-16 fc-210-40-130-255 ff-roboto-mono s e wc"><div class="s t wf hf">USD</div></div><div class="hc s e wc"><div class="s t wf hf">.</div></div></div><div class="hc font-size-16 s e wc"><code-editor></code-editor></div><div class="spacing-5-5 font-size-36 w7 tc ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">The Custom Scalar Checklist</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">The </div></div><div class="hc w7 s e wc"><div class="s t wf hf">Custom Scalar Checklist</div></div><div class="hc s e wc"><div class="s t wf hf"> guides you through </div></div><div class="hc w7 s e wc"><div class="s t wf hf">simple</div></div><div class="hc s e wc"><div class="s t wf hf">, </div></div><div class="hc w7 s e wc"><div class="s t wf hf">actionable</div></div><div class="hc s e wc"><div class="s t wf hf"> steps to identify where you should be using Custom Scalars in your schema.</div></div></div><div class="spacing-15-15 s p wf"><div class="hc s e wc"><div class="s t wf hf">Download it now to get the descriptions and examples of all of these types of fields which should be turned into Custom Scalars:</div></div></div><div class="hc s c wc ct cl"><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Unit Contract</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Format Contract</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Context Contract</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Enumeration Contract</div></div></div></div></div><div class="hc s c wc ct cl"></div></div></div><div class="hc s e wc"><div class="hc p-20 spacing-20-20 box-0px0px1020px255px204-204-204-255  box-0px0px1020px255px217-217-217-255-hv ah cx s c max-width-500 wf ct cl"><div class="hc tc spacing-30-30 ah cx s c wc ct cl"><div class="spacing-5-5 font-size-36 w7 tc ff-raleway s p wf"><div class="hc s e wc"><div class="s t wf hf">✅ Improve your Schema with this step-by-step checklist</div></div></div><div class="hc s c wc ct cl"><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Simple steps that will improve your elm-graphql codebase!</div></div></div></div></div><div class="hc s c wc ct cl"></div></div><div class="hc spacing-20-20 s c wf ct cl"><div class="hc spacing-10-10 s r wf cl ccy"><div class="hc av at pad-0-0-0-20 s e wc"><div class="s t wf hf">•</div></div><div class="hc s r wf cl ccy"><div class="spacing-5-5 s p wf"><div class="hc s e wc"><div class="s t wf hf">Learn the 4 kinds of Contracts that you can turn into Custom Scalars</div></div></div></div></div><div class="hc s c wc ct cl"></div></div></div></div><div class="hc s e wf"><form action="https://www.getdrip.com/forms/573190762/submissions" method="post" data-drip-embedded-form="573190762" style="font-family: &quot;Open Sans&quot;;"><h2 data-drip-attribute="headline" style="display: none;">Incremental Elm</h2><div data-drip-attribute="description"></div><div style="margin-bottom: 20px; font-weight: bold;"><label for="drip-email">Email Address</label><br><input type="email" id="drip-email" name="fields[email]"></div><div style="margin-bottom: 20px; font-weight: bold;"><label for="drip-first-name">Your first name</label><br><input type="text" id="drip-first-name" name="fields[first_name]"></div><div aria-hidden="true" style="display: none;"><label for="drip-reference-id">Reference ID</label><br><input type="text" id="drip-reference-id" name="fields[reference_id]"></div><div aria-hidden="true" style="display: none;"><label for="website">Website</label><br><input type="text" id="website" name="website"></div><div><input class="button" data-drip-attribute="sign-up-button" name="subscribe" type="submit" value="Download the checklist" style="width: 100%;"></div></form></div><div class="spacing-5-5 fc-0-0-0-128 font-size-14 tc s p wf"><div class="s t wc hc">We'll never share your email. Unsubscribe any time.</div></div></div></div></div></div></div></div></div></body></html>
